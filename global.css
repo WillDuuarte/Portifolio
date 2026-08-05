@@ -31,6 +31,14 @@
 
 html {
     scroll-behavior: smooth;
+    /* compensa a altura da navegação fixa nos saltos de âncora */
+    scroll-padding-top: 80px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
 }
 
 body {
@@ -43,19 +51,37 @@ img {
     max-width: 100%;
 }
 
-header {
-    background-image: url("assets/images/Background_Intro.png");
-    background-size: cover;
-    background-position: center;
-    padding: 72px var(--space-inline) 48px;
+/* As seções ficam acima da tela do vento (#vento, z-index 0) e os fundos
+   viram semitransparentes para que a animação apareça por trás. */
+header,
+main,
+#servicos,
+footer {
+    position: relative;
+    z-index: 1;
 }
 
-main {
-    background-color: var(--gray-500);
+header::before,
+footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.5;
+}
+
+header {
+    padding: 112px var(--space-inline) 48px;
+}
+
+header::before {
+    background-image: url("assets/images/Background_Intro.png");
 }
 
 #servicos {
-    background-color: var(--gray-600);
+    background-color: rgba(13, 14, 17, 0.6);
 }
 
 .color {
@@ -63,10 +89,8 @@ main {
     font: var(--Sub);
 }
 
-footer {
+footer::before {
     background-image: url("assets/images/Background_Contacts.png");
-    background-size: cover;
-    background-position: center;
 }
 
 @media (min-width: 768px) {
@@ -74,7 +98,7 @@ footer {
         --space-inline: 24px;
     }
     header {
-        padding-block: 96px 56px;
+        padding-block: 128px 56px;
     }
 }
 
@@ -83,6 +107,6 @@ footer {
         --space-inline: 32px;
     }
     header {
-        padding-block: 120px 57px;
+        padding-block: 152px 57px;
     }
 }

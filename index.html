@@ -11,27 +11,51 @@
     <link rel="stylesheet" href="style.css">
 
     <title>Portfólio</title>
+
+    <script>document.documentElement.classList.add('js');</script>
 </head>
 
 <body>
-    <header>
-        <div id="perfil">
-            <div id="style">
+    <canvas id="vento" aria-hidden="true"></canvas>
+    <canvas id="rastro" aria-hidden="true"></canvas>
+
+    <nav id="navbar" aria-label="Navegação principal">
+        <div class="nav-container">
+            <!-- <a href="" class="nav-logo">Will<span class="nav-logo-ponto"></span></a>
+            <p class="nav-logo">Will</p> -->
+            <button type="button" id="nav-toggle" class="nav-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-menu">
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+            </button>
+
+            <ul id="nav-menu" class="nav-menu">
+                <li><a href="#inicio" class="nav-link">Início</a></li>
+                <li><a href="#projetos-destaque" class="nav-link">Projetos</a></li>
+                <li><a href="#servicos" class="nav-link">Serviços</a></li>
+                <li><a href="#contato" class="nav-link">Contato</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header id="inicio">
+        <div id="perfil" data-revelar-grupo data-revelar-ciclo="6">
+            <div id="style" data-revelar>
                 <img src="assets/will.jpeg" alt="Foto de Perfil">
                 <!-- <div id="icon">
                     <img src="/assets/icons/Vector.svg" alt="">
                 </div> -->
             </div>
 
-            <p class="sub">Hello World! Meu nome é <span class="color">Willian Duarte</span> e sou</p>
+            <p class="sub" data-revelar>Hello World! Meu nome é <span class="color">Willian Duarte</span> e sou</p>
 
-            <h1>Desenvolvedor Front-End</h1>
+            <h1 data-revelar>Desenvolvedor Front-End</h1>
 
-            <p class="sm">
+            <p class="sm" data-revelar>
                 Transformo necessidades em aplicações reais, evolventes e funcionais. Desenvolvo sistemas através da<br> minha paixão pela tecnologia, contribuindo com soluções inovadoras e eficazes para desafios complexos.
             </p>
 
-            <div id="tec">
+            <div id="tec" data-revelar>
                 <div>
                     <img src="assets/icons/GitHub.svg" alt="">
                     <p>GitHub</p>
@@ -58,7 +82,7 @@
                 </div>
             </div>
 
-            <div id="seta">
+            <div id="seta" data-revelar>
                 <a href="#projetos-destaque">
                     <img src="assets/icons/Seta(1).svg" alt="Seta para baixo">
                 </a>
@@ -68,46 +92,62 @@
 
     <main>
         <section id="projetos-destaque">
-            <div id="cabecalho">
+            <div id="cabecalho" data-revelar>
                 <span class="color">Meu trabalho</span>
 
                 <h2>Veja os projetos em destaque</h2>
             </div>
 
-            <div id="projetos">
-                <div class="projeto">
+            <div id="filtros" role="group" aria-label="Filtrar projetos por tipo">
+                <button type="button" class="filtro" data-filtro="todos" aria-pressed="true">Todos</button>
+                <button type="button" class="filtro" data-filtro="pagina" aria-pressed="false">Páginas</button>
+                <button type="button" class="filtro" data-filtro="landing" aria-pressed="false">Landing Pages</button>
+                <button type="button" class="filtro" data-filtro="app" aria-pressed="false">Aplicativos</button>
+            </div>
+
+            <p id="filtro-status" class="apenas-leitor" role="status" aria-live="polite"></p>
+
+            <div id="projetos" data-revelar-grupo>
+                <div class="projeto" data-revelar data-categoria="pagina">
                     <img src="assets/images/Thumbnail_Project-01.png" alt="">
 
                     <h3>Travelgram</h3>
                     <p>Rede social onde as pessoas mostram os registros de suas viagens pelo mundo</p>
                 </div>
 
-                <div class="projeto">
+                <div class="projeto" data-revelar data-categoria="pagina">
                     <img src="assets/images/Thumbnail_Project-02.png" alt="">
 
                     <h3>Tech News</h3>
                     <p>Homepage de um portal de notícias sobre a área de tecnologia</p>
                 </div>
 
-                <div class="projeto">
+                <div class="projeto" data-revelar data-categoria="pagina">
                     <img src="assets/images/Thumbnail_Project-03.png" alt="">
 
                     <h3>Página de receita</h3>
                     <p>Página com o passo a passo de uma receita para cupcakes</p>
                 </div>
 
-                <div class="projeto">
+                <div class="projeto" data-revelar data-categoria="pagina">
                     <img src="assets/images/Thumbnail_Project-06.png" alt="">
 
                     <h3>Página de turismo</h3>
                     <p>Página com as principais informações para quem quer viajar para Busan</p>
                 </div>
 
-                <div class="projeto">
+                <div class="projeto" data-revelar data-categoria="landing">
                     <img src="assets/images/Thumbnail_Project-07.png" alt="">
 
                     <h3>DevLinks</h3>
                     <p>Página única para centralizar e divulgar links com design moderno e responsivo.</p>
+                </div>
+
+                <div class="projeto" data-revelar data-categoria="app">
+                    <img src="assets/images/Thumbnail_Project-08.png" alt="">
+
+                    <h3>Lista de Compras</h3>
+                    <p>Aplicativo para gerenciar listas de compras de forma prática e organizada.</p>
                 </div>
             </div>
         </section>
@@ -115,13 +155,13 @@
 
     <div id="servicos">
         <div id="srv">
-            <div id="cabecalho-servicos">
+            <div id="cabecalho-servicos" data-revelar>
                 <span class="color">Meus serviços</span>
                 <h2>Como posso ajudar o seu negócio</h2>
             </div>
 
-            <div id="lista-servicos">
-                <div class="ngc">
+            <div id="lista-servicos" data-revelar-grupo>
+                <div class="ngc" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="7" />
@@ -134,7 +174,7 @@
                     <p>Desenvolvimento de interfaces modernas com foco em usabilidade, responsividade e presença digital.</p>
                 </div>
 
-                <div class="ngc">
+                <div class="ngc" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="16 18 22 12 16 6" />
@@ -145,7 +185,7 @@
                     <p>Implementação de componentes interativos, comportamento dinâmico e código escalável para projetos web.</p>
                 </div>
 
-                <div class="ngc">
+                <div class="ngc" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 9l10 10" />
@@ -159,7 +199,7 @@
                     <p>Páginas focadas em produto, lançamento ou captação, com visual forte e estrutura orientada a resultado.</p>
                 </div>
 
-                <div class="ngc">
+                <div class="ngc" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -169,7 +209,7 @@
                     <p>Melhoria de carregamento, responsividade e fluidez da navegação para aumentar retenção e conversão.</p>
                 </div>
 
-                <div class="ngc">
+                <div class="ngc" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2h4a2 2 0 0 1 2 2v4h2a2 2 0 1 1 0 4h-2v4a2 2 0 0 1-2 2h-4v2a2 2 0 1 1-4 0v-2H6a2 2 0 0 1-2-2v-4H2a2 2 0 1 1 0-4h2V4a2 2 0 0 1 2-2h4V0a2 2 0 1 1 4 0v2z" />
@@ -182,16 +222,16 @@
         </div>
     </div>
 
-    <footer>
+    <footer id="contato">
         <div id="box">
-            <div id="cabecalho-footer">
+            <div id="cabecalho-footer" data-revelar>
                 <span id="col">Contato</span>
                 <h2>Gostou do meu trabalho? </h2>
                 <p class="tm">Entre em contato ou acompanhe as minhas redes sociais!</p>
             </div>
 
-            <div id="contatos">
-                <div class="contato">
+            <div id="contatos" data-revelar-grupo data-revelar-ciclo="4">
+                <div class="contato" data-revelar>
                     <img src="assets/icons/Linkedin.svg" alt="">
                     <p>Linkedin</p>
                     <a href="https://www.linkedin.com/in/willian-duarte-922a9a2b0" target="_blank">
@@ -207,7 +247,7 @@
                     </a>
                 </div> -->
 
-                <div class="contato">
+                <div class="contato" data-revelar>
                     <img src="assets/icons/GitHub(1).svg" alt="">
                     <p>GitHub</p>
                     <a href="https://github.com/Will-SDuarte" target="_blank">
@@ -215,10 +255,18 @@
                     </a>
                 </div>
 
-                <div class="contato">
+                <div class="contato" data-revelar>
                     <img src="assets/icons/E-mail.svg" alt="">
                     <p>E-mail</p>
                     <a href="mailto:williandasilvaduarte10@gmail.com" target="_blank">
+                        <img src="assets/icons/Link.svg" alt="">
+                    </a>
+                </div>
+
+                <div class="contato" data-revelar>
+                    <img src="assets/icons/WhatsApp.svg" alt="">
+                    <p>WhatsApp</p>
+                    <a href="https://wa.me/5511999842697" target="_blank" rel="noopener">
                         <img src="assets/icons/Link.svg" alt="">
                     </a>
                 </div>
@@ -226,7 +274,7 @@
         </div>
     </footer>
 
-
+    <script src="main.js" defer></script>
 </body>
 
 </html>
