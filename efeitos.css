@@ -1,0 +1,455 @@
+/* ============================================================
+   Portfólio — efeitos, componentes e microinterações
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   Atalho de teclado para pular a navegação
+------------------------------------------------------------ */
+.pular {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    z-index: 300;
+    padding: 10px 20px;
+    border: 1px solid var(--blue);
+    border-radius: 999px;
+    background-color: var(--gray-600);
+    color: var(--gray-100);
+    font: var(--Text-sm);
+    text-decoration: none;
+    transform: translate(-50%, -220%);
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pular:focus {
+    transform: translate(-50%, 0);
+}
+
+/* ------------------------------------------------------------
+   Barra de progresso da leitura
+------------------------------------------------------------ */
+#progresso {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 120;
+    height: 3px;
+    pointer-events: none;
+}
+
+#progresso-barra {
+    display: block;
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: left center;
+    background-image: linear-gradient(90deg, var(--blue), var(--purple), var(--green), var(--yellow), var(--red));
+}
+
+/* ------------------------------------------------------------
+   Esteira infinita
+------------------------------------------------------------ */
+#esteira {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(6px, 1.4vw, 14px);
+    padding-block: clamp(28px, 5vw, 48px);
+    background-color: rgba(13, 14, 17, 0.45);
+    border-block: 1px solid rgba(226, 228, 233, 0.07);
+    overflow: hidden;
+}
+
+.esteira {
+    --esteira-gap: clamp(22px, 4.5vw, 52px);
+    position: relative;
+    overflow: hidden;
+    /* apaga as pontas para a emenda do laço nunca aparecer */
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.esteira-trilho {
+    display: flex;
+    align-items: center;
+    gap: var(--esteira-gap);
+    width: max-content;
+    will-change: transform;
+}
+
+.esteira-grupo {
+    display: flex;
+    align-items: center;
+    gap: var(--esteira-gap);
+    width: max-content;
+    list-style: none;
+}
+
+.esteira-grupo li {
+    display: flex;
+    align-items: center;
+    gap: 0.42em;
+    white-space: nowrap;
+    font: 700 clamp(1.15rem, 3.2vw, 2.1rem) / 1.15 var(--font-family);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    color: var(--gray-100);
+}
+
+.esteira-grupo li::before {
+    content: "";
+    flex: none;
+    width: 0.3em;
+    height: 0.3em;
+    border-radius: 50%;
+    background-color: var(--blue);
+}
+
+.esteira-grupo li:nth-child(5n + 2)::before {
+    background-color: var(--purple);
+}
+
+.esteira-grupo li:nth-child(5n + 3)::before {
+    background-color: var(--green);
+}
+
+.esteira-grupo li:nth-child(5n + 4)::before {
+    background-color: var(--yellow);
+}
+
+.esteira-grupo li:nth-child(5n + 5)::before {
+    background-color: var(--red);
+}
+
+/* segunda faixa: mesmo desenho, só o contorno das letras */
+.esteira-contorno .esteira-grupo li {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--gray-300);
+}
+
+@supports not (-webkit-text-stroke: 1px currentColor) {
+    .esteira-contorno .esteira-grupo li {
+        color: var(--gray-300);
+    }
+}
+
+/* com JS a faixa é arrastável; sem JS ela vira uma lista rolável */
+.js .esteira {
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.js .esteira.arrastando {
+    cursor: grabbing;
+}
+
+html:not(.js) .esteira,
+.esteira-estatica {
+    overflow-x: auto;
+    cursor: auto;
+}
+
+/* ------------------------------------------------------------
+   Títulos revelados palavra por palavra
+------------------------------------------------------------ */
+.js [data-dividir] .palavra {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    /* espaço para não cortar acentos e descidas de letra */
+    padding-block: 0.12em;
+    margin-block: -0.12em;
+}
+
+.js [data-dividir] .palavra > span {
+    display: inline-block;
+    transform: translateY(115%);
+}
+
+/* o título cuida da própria entrada: cancela a revelação genérica */
+.js [data-dividir],
+.js [data-dividir].visivel {
+    opacity: 1;
+    animation: none;
+}
+
+.js [data-dividir].visivel .palavra > span {
+    animation: subir-palavra 700ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--atraso, 0ms) + var(--i, 0) * 70ms) backwards;
+    transform: none;
+}
+
+@keyframes subir-palavra {
+    from {
+        transform: translateY(115%);
+    }
+    to {
+        transform: none;
+    }
+}
+
+/* ------------------------------------------------------------
+   Cargo que se digita sozinho no título
+------------------------------------------------------------ */
+#papel {
+    display: inline-block;
+    text-align: left;
+    color: var(--blue);
+}
+
+#papel::after {
+    content: "";
+    display: inline-block;
+    width: 0.06em;
+    height: 0.86em;
+    margin-left: 0.05em;
+    vertical-align: -0.06em;
+    background-color: var(--blue);
+    animation: piscar 1.05s steps(1) infinite;
+}
+
+@keyframes piscar {
+    0%,
+    45% {
+        opacity: 1;
+    }
+    46%,
+    100% {
+        opacity: 0;
+    }
+}
+
+/* ------------------------------------------------------------
+   Cartões: luz que segue o cursor e leve inclinação 3D
+------------------------------------------------------------ */
+.projeto,
+.ngc {
+    position: relative;
+    isolation: isolate;
+}
+
+.projeto::after,
+.ngc::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 320ms ease;
+    background-image: radial-gradient(
+        circle at var(--mx, 50%) var(--my, 50%),
+        rgba(57, 150, 219, 0.28),
+        rgba(57, 150, 219, 0) 62%
+    );
+}
+
+.ngc::after {
+    background-image: radial-gradient(
+        circle at var(--mx, 50%) var(--my, 50%),
+        rgba(187, 114, 233, 0.22),
+        rgba(187, 114, 233, 0) 66%
+    );
+}
+
+.projeto:hover::after,
+.projeto:focus-visible::after,
+.ngc:hover::after {
+    opacity: 1;
+}
+
+/* transform montado por variáveis: elevação, inclinação e o
+   deslocamento do FLIP convivem sem sobrescrever uns aos outros */
+.projeto {
+    transform: translate3d(var(--desvio-x, 0px), calc(var(--lift, 0px) + var(--desvio-y, 0px)), 0)
+        perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transform-style: preserve-3d;
+}
+
+.projeto.sem-transicao {
+    transition: none;
+}
+
+/* ------------------------------------------------------------
+   Pílula que desliza entre os filtros
+------------------------------------------------------------ */
+#filtros {
+    position: relative;
+}
+
+.filtro-indicador {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--w, 0px);
+    height: var(--h, 0px);
+    border: 1px solid var(--blue);
+    border-radius: 999px;
+    background-color: rgba(57, 150, 219, 0.16);
+    box-shadow: 0 8px 22px -14px rgba(57, 150, 219, 0.9);
+    transform: translate3d(var(--x, 0px), var(--y, 0px), 0);
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), width 420ms cubic-bezier(0.22, 1, 0.36, 1),
+        height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+
+.filtro-indicador.sem-transicao {
+    transition: none;
+}
+
+#filtros.com-indicador .filtro {
+    position: relative;
+    z-index: 1;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+#filtros.com-indicador .filtro:hover {
+    border-color: var(--gray-300);
+}
+
+#filtros.com-indicador .filtro[aria-pressed="true"] {
+    color: var(--gray-100);
+    border-color: transparent;
+}
+
+/* ------------------------------------------------------------
+   Voltar ao topo
+------------------------------------------------------------ */
+.ao-topo {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 150;
+    display: grid;
+    place-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 1px solid var(--gray-400);
+    border-radius: 50%;
+    background-color: rgba(41, 44, 52, 0.92);
+    backdrop-filter: blur(8px);
+    color: var(--gray-100);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(14px) scale(0.9);
+    transition: opacity 280ms ease, transform 280ms cubic-bezier(0.22, 1, 0.36, 1), visibility 280ms,
+        border-color 220ms ease, background-color 220ms ease;
+}
+
+.ao-topo.visivel {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+}
+
+.ao-topo:hover {
+    border-color: var(--blue);
+    background-color: rgba(57, 150, 219, 0.2);
+    transform: translateY(-3px);
+}
+
+.ao-topo:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+    .ao-topo {
+        right: 24px;
+        bottom: 24px;
+    }
+}
+
+/* ------------------------------------------------------------
+   Parallax dos fundos e do topo
+------------------------------------------------------------ */
+/* o fundo desliza dentro da própria seção: nada vaza para a de baixo */
+header,
+footer {
+    overflow: hidden;
+}
+
+header::before,
+footer::before {
+    /* folga para o fundo poder deslizar sem descobrir as bordas */
+    inset: -14% 0;
+    transform: translate3d(0, var(--parallax, 0px), 0);
+    will-change: transform;
+}
+
+#perfil {
+    transform: translate3d(0, var(--deriva, 0px), 0);
+}
+
+/* ------------------------------------------------------------
+   Entrada escalonada do menu no celular
+------------------------------------------------------------ */
+@media (max-width: 767px) {
+    .nav-menu li {
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity 220ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #navbar.menu-aberto .nav-menu li {
+        opacity: 1;
+        transform: none;
+    }
+
+    #navbar.menu-aberto .nav-menu li:nth-child(1) {
+        transition-delay: 60ms;
+    }
+
+    #navbar.menu-aberto .nav-menu li:nth-child(2) {
+        transition-delay: 110ms;
+    }
+
+    #navbar.menu-aberto .nav-menu li:nth-child(3) {
+        transition-delay: 160ms;
+    }
+
+    #navbar.menu-aberto .nav-menu li:nth-child(4) {
+        transition-delay: 210ms;
+    }
+}
+
+/* ------------------------------------------------------------
+   Sem movimento: tudo estático, nada pisca nem desliza
+------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    .pular,
+    .filtro-indicador,
+    .ao-topo,
+    .projeto::after,
+    .ngc::after,
+    .nav-menu li {
+        transition: none;
+    }
+
+    #papel::after {
+        display: none;
+    }
+
+    .js [data-dividir] .palavra > span,
+    .js [data-dividir].visivel .palavra > span {
+        transform: none;
+        animation: none;
+    }
+
+    header::before,
+    footer::before,
+    #perfil {
+        transform: none;
+    }
+
+    .ao-topo:hover {
+        transform: none;
+    }
+}

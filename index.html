@@ -10,12 +10,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Asap:ital,wght@0,700;1,700&family=Inconsolata&family=Maven+Pro&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
-    <title>Portfólio</title>
+    <meta name="description" content="Portfólio de Willian Duarte, desenvolvedor front-end: interfaces responsivas, landing pages e sites com foco em usabilidade, acessibilidade e performance.">
+    <meta name="theme-color" content="#16181D">
+
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:title" content="Willian Duarte — Desenvolvedor Front-End">
+    <meta property="og:description" content="Interfaces responsivas, landing pages e sites com foco em usabilidade, acessibilidade e performance.">
+
+    <title>Willian Duarte — Desenvolvedor Front-End</title>
 
     <script>document.documentElement.classList.add('js');</script>
 </head>
 
 <body>
+    <a class="pular" href="#inicio">Pular para o conteúdo</a>
+
+    <div id="progresso" aria-hidden="true"><span id="progresso-barra"></span></div>
+
     <canvas id="vento" aria-hidden="true"></canvas>
     <canvas id="rastro" aria-hidden="true"></canvas>
 
@@ -49,7 +61,7 @@
 
             <p class="sub" data-revelar>Hello World! Meu nome é <span class="color">Willian Duarte</span> e sou</p>
 
-            <h1 data-revelar>Desenvolvedor Front-End</h1>
+            <h1 data-revelar aria-label="Desenvolvedor Front-End">Desenvolvedor <span id="papel" aria-hidden="true" data-papeis="Front-End|de Interfaces|de Landing Pages|JavaScript">Front-End</span></h1>
 
             <p class="sm" data-revelar>
                 Transformo necessidades em aplicações reais, evolventes e funcionais. Desenvolvo sistemas através da<br> minha paixão pela tecnologia, contribuindo com soluções inovadoras e eficazes para desafios complexos.
@@ -89,79 +101,81 @@
             </div>
         </div>
     </header>
+    <section id="esteira" aria-labelledby="esteira-titulo" data-revelar>
+        <h2 id="esteira-titulo" class="apenas-leitor">O que eu construo e com o que trabalho</h2>
+
+        <div class="esteira" data-esteira data-velocidade="46">
+            <ul class="esteira-grupo">
+                <li>Interfaces responsivas</li>
+                <li>Landing pages</li>
+                <li>Acessibilidade</li>
+                <li>Performance</li>
+                <li>Componentes reutilizáveis</li>
+                <li>Código escalável</li>
+            </ul>
+        </div>
+
+        <div class="esteira esteira-contorno" data-esteira data-velocidade="34" data-direcao="-1">
+            <ul class="esteira-grupo">
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>JavaScript</li>
+                <li>Liquid</li>
+                <li>Git &amp; GitHub</li>
+            </ul>
+        </div>
+    </section>
 
     <main>
         <section id="projetos-destaque">
-            <div id="cabecalho" data-revelar>
-                <span class="color">Meu trabalho</span>
+            <div id="cabecalho" data-revelar-grupo data-revelar-ciclo="2">
+                <span class="color" data-revelar>Meu trabalho</span>
 
-                <h2>Veja os projetos em destaque</h2>
+                <h2 data-revelar data-dividir>Veja os projetos em destaque</h2>
             </div>
 
             <div id="filtros" role="group" aria-label="Filtrar projetos por tipo">
                 <button type="button" class="filtro" data-filtro="todos" aria-pressed="true">Todos</button>
-                <button type="button" class="filtro" data-filtro="pagina" aria-pressed="false">Páginas</button>
-                <button type="button" class="filtro" data-filtro="landing" aria-pressed="false">Landing Pages</button>
-                <button type="button" class="filtro" data-filtro="app" aria-pressed="false">Aplicativos</button>
+                <button type="button" class="filtro" data-filtro="unica" aria-pressed="false">Página única</button>
+                <button type="button" class="filtro" data-filtro="multipagina" aria-pressed="false">Multipágina</button>
             </div>
 
             <p id="filtro-status" class="apenas-leitor" role="status" aria-live="polite"></p>
 
             <div id="projetos" data-revelar-grupo>
-                <div class="projeto" data-revelar data-categoria="pagina">
-                    <img src="assets/images/Thumbnail_Project-01.png" alt="">
-
-                    <h3>Travelgram</h3>
-                    <p>Rede social onde as pessoas mostram os registros de suas viagens pelo mundo</p>
-                </div>
-
-                <div class="projeto" data-revelar data-categoria="pagina">
-                    <img src="assets/images/Thumbnail_Project-02.png" alt="">
-
-                    <h3>Tech News</h3>
-                    <p>Homepage de um portal de notícias sobre a área de tecnologia</p>
-                </div>
-
-                <div class="projeto" data-revelar data-categoria="pagina">
-                    <img src="assets/images/Thumbnail_Project-03.png" alt="">
-
-                    <h3>Página de receita</h3>
-                    <p>Página com o passo a passo de uma receita para cupcakes</p>
-                </div>
-
-                <div class="projeto" data-revelar data-categoria="pagina">
-                    <img src="assets/images/Thumbnail_Project-06.png" alt="">
-
-                    <h3>Página de turismo</h3>
-                    <p>Página com as principais informações para quem quer viajar para Busan</p>
-                </div>
-
-                <div class="projeto" data-revelar data-categoria="landing">
-                    <img src="assets/images/Thumbnail_Project-07.png" alt="">
+                <a class="projeto" data-cartao="7" href="https://will-sduarte.github.io/Rocketseat-DevLinks/" target="_blank" rel="noopener" data-revelar data-categoria="unica">
+                    <img src="assets/images/Thumbnail_Project-07.png" alt="" loading="lazy" decoding="async">
 
                     <h3>DevLinks</h3>
                     <p>Página única para centralizar e divulgar links com design moderno e responsivo.</p>
-                </div>
+                </a>
 
-                <div class="projeto" data-revelar data-categoria="app">
-                    <img src="assets/images/Thumbnail_Project-08.png" alt="">
+                <a class="projeto" data-cartao="7" href="https://will-sduarte.github.io/Lista-de-compras/" target="_blank" rel="noopener" data-revelar data-categoria="unica">
+                    <img src="assets/images/Thumbnail_Project-08.png" alt="" loading="lazy" decoding="async">
 
                     <h3>Lista de Compras</h3>
-                    <p>Aplicativo para gerenciar listas de compras de forma prática e organizada.</p>
-                </div>
+                    <p>Site para gerenciar listas de compras de forma prática e organizada.</p>
+                </a>
+
+                <a class="projeto" data-cartao="7" href="https://project-dragon-ball.vercel.app" target="_blank" rel="noopener" data-revelar data-categoria="multipagina">
+                    <img src="assets/images/Thumbnail_Project-09.png" alt="" loading="lazy" decoding="async">
+
+                    <h3>Dragon Ball — Arquivo Z</h3>
+                    <p>Site multipágina com o arquivo dos guerreiros Z, reunindo saiyajins, fusões e vilões em seções de consulta</p>
+                </a>
             </div>
         </section>
     </main>
 
     <div id="servicos">
         <div id="srv">
-            <div id="cabecalho-servicos" data-revelar>
-                <span class="color">Meus serviços</span>
-                <h2>Como posso ajudar o seu negócio</h2>
+            <div id="cabecalho-servicos" data-revelar-grupo data-revelar-ciclo="2">
+                <span class="color" data-revelar>Meus serviços</span>
+                <h2 data-revelar data-dividir>Como posso ajudar o seu negócio</h2>
             </div>
 
             <div id="lista-servicos" data-revelar-grupo>
-                <div class="ngc" data-revelar>
+                <div class="ngc" data-cartao="0" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="7" />
@@ -174,7 +188,7 @@
                     <p>Desenvolvimento de interfaces modernas com foco em usabilidade, responsividade e presença digital.</p>
                 </div>
 
-                <div class="ngc" data-revelar>
+                <div class="ngc" data-cartao="0" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="16 18 22 12 16 6" />
@@ -185,7 +199,7 @@
                     <p>Implementação de componentes interativos, comportamento dinâmico e código escalável para projetos web.</p>
                 </div>
 
-                <div class="ngc" data-revelar>
+                <div class="ngc" data-cartao="0" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 9l10 10" />
@@ -199,7 +213,7 @@
                     <p>Páginas focadas em produto, lançamento ou captação, com visual forte e estrutura orientada a resultado.</p>
                 </div>
 
-                <div class="ngc" data-revelar>
+                <div class="ngc" data-cartao="0" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -209,7 +223,7 @@
                     <p>Melhoria de carregamento, responsividade e fluidez da navegação para aumentar retenção e conversão.</p>
                 </div>
 
-                <div class="ngc" data-revelar>
+                <div class="ngc" data-cartao="0" data-revelar>
 
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2h4a2 2 0 0 1 2 2v4h2a2 2 0 1 1 0 4h-2v4a2 2 0 0 1-2 2h-4v2a2 2 0 1 1-4 0v-2H6a2 2 0 0 1-2-2v-4H2a2 2 0 1 1 0-4h2V4a2 2 0 0 1 2-2h4V0a2 2 0 1 1 4 0v2z" />
@@ -224,55 +238,52 @@
 
     <footer id="contato">
         <div id="box">
-            <div id="cabecalho-footer" data-revelar>
-                <span id="col">Contato</span>
-                <h2>Gostou do meu trabalho? </h2>
-                <p class="tm">Entre em contato ou acompanhe as minhas redes sociais!</p>
+            <div id="cabecalho-footer" data-revelar-grupo data-revelar-ciclo="3">
+                <span id="col" data-revelar>Contato</span>
+                <h2 data-revelar data-dividir>Gostou do meu trabalho?</h2>
+                <p class="tm" data-revelar>Entre em contato ou acompanhe as minhas redes sociais!</p>
             </div>
 
             <div id="contatos" data-revelar-grupo data-revelar-ciclo="4">
-                <div class="contato" data-revelar>
-                    <img src="assets/icons/Linkedin.svg" alt="">
+                <a class="contato" href="https://www.linkedin.com/in/willian-duarte-922a9a2b0" target="_blank" rel="noopener" data-revelar>
+                    <img src="assets/icons/Linkedin.svg" alt="" loading="lazy" decoding="async">
                     <p>Linkedin</p>
-                    <a href="https://www.linkedin.com/in/willian-duarte-922a9a2b0" target="_blank">
-                        <img src="assets/icons/Link.svg" alt="">
-                    </a>
-                </div>
+                    <img src="assets/icons/Link.svg" alt="" loading="lazy" decoding="async">
+                </a>
 
-                <!-- <div class="contato">
+                <!-- <a class="contato" href="https://www.instagram.com/willzs_duarte" target="_blank" rel="noopener" data-revelar>
                     <img src="assets/icons/Instagram.svg" alt="">
                     <p>Instagram</p>
-                    <a href="https://www.instagram.com/willzs_duarte" target="_blank">
-                        <img src="assets/icons/Link.svg" alt="">
-                    </a>
-                </div> -->
+                    <img src="assets/icons/Link.svg" alt="" loading="lazy" decoding="async">
+                </a> -->
 
-                <div class="contato" data-revelar>
-                    <img src="assets/icons/GitHub(1).svg" alt="">
+                <a class="contato" href="https://github.com/Will-SDuarte" target="_blank" rel="noopener" data-revelar>
+                    <img src="assets/icons/GitHub(1).svg" alt="" loading="lazy" decoding="async">
                     <p>GitHub</p>
-                    <a href="https://github.com/Will-SDuarte" target="_blank">
-                        <img src="assets/icons/Link.svg" alt="">
-                    </a>
-                </div>
+                    <img src="assets/icons/Link.svg" alt="" loading="lazy" decoding="async">
+                </a>
 
-                <div class="contato" data-revelar>
-                    <img src="assets/icons/E-mail.svg" alt="">
+                <a class="contato" href="mailto:williandasilvaduarte10@gmail.com" data-revelar>
+                    <img src="assets/icons/E-mail.svg" alt="" loading="lazy" decoding="async">
                     <p>E-mail</p>
-                    <a href="mailto:williandasilvaduarte10@gmail.com" target="_blank">
-                        <img src="assets/icons/Link.svg" alt="">
-                    </a>
-                </div>
+                    <img src="assets/icons/Link.svg" alt="" loading="lazy" decoding="async">
+                </a>
 
-                <div class="contato" data-revelar>
-                    <img src="assets/icons/WhatsApp.svg" alt="">
+                <a class="contato" href="https://wa.me/5511999842697" target="_blank" rel="noopener" data-revelar>
+                    <img src="assets/icons/WhatsApp.svg" alt="" loading="lazy" decoding="async">
                     <p>WhatsApp</p>
-                    <a href="https://wa.me/5511999842697" target="_blank" rel="noopener">
-                        <img src="assets/icons/Link.svg" alt="">
-                    </a>
-                </div>
+                    <img src="assets/icons/Link.svg" alt="" loading="lazy" decoding="async">
+                </a>
             </div>
         </div>
     </footer>
+
+    <button type="button" id="ao-topo" class="ao-topo" aria-label="Voltar ao topo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 16V5" />
+            <path d="M5 10l5-5 5 5" />
+        </svg>
+    </button>
 
     <script src="main.js" defer></script>
 </body>

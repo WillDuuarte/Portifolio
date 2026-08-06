@@ -163,6 +163,77 @@
         var botoes = Array.prototype.slice.call(barra.querySelectorAll('.filtro'));
         var status = document.querySelector('#filtro-status');
 
+        // pílula que desliza por trás do botão escolhido
+        var indicador = document.createElement('span');
+        indicador.className = 'filtro-indicador';
+        indicador.setAttribute('aria-hidden', 'true');
+        barra.insertBefore(indicador, barra.firstChild);
+        barra.classList.add('com-indicador');
+
+        function botaoAtivo() {
+            for (var i = 0; i < botoes.length; i++) {
+                if (botoes[i].getAttribute('aria-pressed') === 'true') return botoes[i];
+            }
+            return botoes[0];
+        }
+
+        // na primeira medida, e a cada remedida, a pílula assume o lugar sem
+        // deslizar: só a troca de filtro merece o movimento
+        function posicionarIndicador(botao, instantaneo) {
+            if (!botao) return;
+
+            if (instantaneo) indicador.classList.add('sem-transicao');
+
+            indicador.style.setProperty('--x', botao.offsetLeft + 'px');
+            indicador.style.setProperty('--y', botao.offsetTop + 'px');
+            indicador.style.setProperty('--w', botao.offsetWidth + 'px');
+            indicador.style.setProperty('--h', botao.offsetHeight + 'px');
+
+            if (instantaneo) {
+                void indicador.offsetWidth;
+                indicador.classList.remove('sem-transicao');
+            }
+        }
+
+        // posições de partida para o FLIP: os cartões deslizam até o novo lugar
+        function medirCartoes() {
+            return projetos.map(function (projeto) {
+                return {
+                    caixa: projeto.getBoundingClientRect(),
+                    visivel: !projeto.classList.contains('oculto')
+                };
+            });
+        }
+
+        function deslizarCartoes(antes) {
+            var destinos = projetos.map(function (projeto) {
+                return projeto.classList.contains('oculto') ? null : projeto.getBoundingClientRect();
+            });
+
+            projetos.forEach(function (projeto, indice) {
+                var destino = destinos[indice];
+                if (!destino) return;
+
+                // cartão que acabou de entrar não tem de onde deslizar
+                if (!antes[indice].visivel) {
+                    projeto.classList.add('entrando');
+                    return;
+                }
+
+                var dx = antes[indice].caixa.left - destino.left;
+                var dy = antes[indice].caixa.top - destino.top;
+                if (!dx && !dy) return;
+
+                projeto.classList.add('sem-transicao');
+                projeto.style.setProperty('--desvio-x', dx.toFixed(1) + 'px');
+                projeto.style.setProperty('--desvio-y', dy.toFixed(1) + 'px');
+                void projeto.offsetWidth;
+                projeto.classList.remove('sem-transicao');
+                projeto.style.setProperty('--desvio-x', '0px');
+                projeto.style.setProperty('--desvio-y', '0px');
+            });
+        }
+
         function aplicar(filtro, animar) {
             var visiveis = 0;
 
@@ -170,11 +241,10 @@
                 projeto.classList.remove('entrando');
             });
 
-            // força o recálculo de estilo para que a animação possa reiniciar
-            if (animar) void barra.offsetWidth;
+            var antes = animar ? medirCartoes() : null;
 
             projetos.forEach(function (projeto) {
-                var categorias = (projeto.dataset.categoria || '').split(/\s+/);
+                var categorias = (projeto.dataset.categoria || '').split(/s+/);
                 var mostrar = filtro === 'todos' || categorias.indexOf(filtro) !== -1;
 
                 projeto.classList.toggle('oculto', !mostrar);
@@ -184,12 +254,15 @@
                 visiveis += 1;
                 // garante que cartões ainda não revelados apareçam junto com o filtro
                 projeto.classList.add('visivel');
-                if (animar) projeto.classList.add('entrando');
             });
+
+            if (antes) deslizarCartoes(antes);
 
             botoes.forEach(function (botao) {
                 botao.setAttribute('aria-pressed', String(botao.dataset.filtro === filtro));
             });
+
+            posicionarIndicador(botaoAtivo());
 
             if (status) {
                 status.textContent = visiveis === 1 ? '1 projeto encontrado' : visiveis + ' projetos encontrados';
@@ -201,7 +274,25 @@
             if (!botao) return;
             aplicar(botao.dataset.filtro, !prefereMenosMovimento);
         });
+
+        var esperaResize = null;
+        window.addEventListener('resize', function () {
+            window.clearTimeout(esperaResize);
+            esperaResize = window.setTimeout(function () {
+                posicionarIndicador(botaoAtivo(), true);
+            }, 150);
+        });
+
+        posicionarIndicador(botaoAtivo(), true);
+
+        // a fonte da web muda a largura dos botões depois de carregar
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(function () {
+                posicionarIndicador(botaoAtivo(), true);
+            });
+        }
     }
+
 
     /* ------------------------------------------------------------
        Vento de fundo
@@ -513,13 +604,395 @@
         document.addEventListener('visibilitychange', esquecerPosicao);
     }
 
+    /* ------------------------------------------------------------
+       Esteira infinita
+    ------------------------------------------------------------ */
+    function iniciarEsteira() {
+        Array.prototype.slice.call(document.querySelectorAll('[data-esteira]')).forEach(montarEsteira);
+    }
+
+    function montarEsteira(caixa) {
+        var grupo = caixa.querySelector('.esteira-grupo');
+        if (!grupo) return;
+
+        // sem movimento: vira uma faixa que a própria pessoa rola
+        if (prefereMenosMovimento) {
+            caixa.classList.add('esteira-estatica');
+            return;
+        }
+
+        var direcao = Number(caixa.dataset.direcao) || 1;
+        var velocidade = Number(caixa.dataset.velocidade) || 40;
+
+        var trilho = document.createElement('div');
+        trilho.className = 'esteira-trilho';
+        caixa.insertBefore(trilho, grupo);
+        trilho.appendChild(grupo);
+
+        var largura = 0; // largura de um grupo + o vão até o próximo
+        var deslocamento = 0;
+        var impulso = 0; // sobra de velocidade depois de arrastar
+        var fator = 1; // desacelera quando o cursor está em cima
+        var alvoFator = 1;
+        var quadroAtual = null;
+        var ultimoTempo = 0;
+        var pausas = 0;
+        var arrastando = false;
+        var ultimoX = 0;
+        var ultimoMovimento = 0;
+
+        function aplicar() {
+            trilho.style.transform = 'translate3d(' + deslocamento.toFixed(2) + 'px, 0, 0)';
+        }
+
+        function avancar(px) {
+            if (!largura) return;
+            deslocamento += px;
+            // mantém o deslocamento dentro de um grupo: a emenda nunca aparece
+            deslocamento = ((deslocamento % largura) - largura) % largura;
+            aplicar();
+        }
+
+        function medir() {
+            while (trilho.children.length > 1) trilho.removeChild(trilho.lastChild);
+
+            var estilo = window.getComputedStyle(trilho);
+            var vao = parseFloat(estilo.columnGap || estilo.gap) || 0;
+
+            largura = grupo.getBoundingClientRect().width + vao;
+            if (!largura) return;
+
+            // cópias suficientes para cobrir a tela mais um grupo de folga
+            var copias = Math.ceil(caixa.clientWidth / largura) + 1;
+            for (var i = 0; i < copias; i++) {
+                var clone = grupo.cloneNode(true);
+                clone.setAttribute('aria-hidden', 'true');
+                trilho.appendChild(clone);
+            }
+
+            avancar(0);
+        }
+
+        function quadro(tempo) {
+            var dt = Math.min((tempo - ultimoTempo) / 1000, 0.05);
+            ultimoTempo = tempo;
+
+            fator += (alvoFator - fator) * Math.min(1, dt * 6);
+
+            if (!arrastando) {
+                avancar((-velocidade * direcao * fator + impulso) * dt);
+                impulso *= Math.pow(0.0025, dt); // o empurrão some em cerca de 1s
+                if (Math.abs(impulso) < 1) impulso = 0;
+            }
+
+            quadroAtual = window.requestAnimationFrame(quadro);
+        }
+
+        function tocar() {
+            if (quadroAtual !== null || pausas > 0) return;
+            ultimoTempo = window.performance.now();
+            quadroAtual = window.requestAnimationFrame(quadro);
+        }
+
+        function pausar() {
+            if (quadroAtual === null) return;
+            window.cancelAnimationFrame(quadroAtual);
+            quadroAtual = null;
+        }
+
+        function segurar() {
+            pausas += 1;
+            pausar();
+        }
+
+        function soltar() {
+            pausas = Math.max(0, pausas - 1);
+            if (!pausas) tocar();
+        }
+
+        // o cursor em cima não congela a faixa, só a deixa lenta:
+        // assim ainda dá para ler e para arrastar
+        caixa.addEventListener('pointerenter', function (evento) {
+            if (evento.pointerType === 'mouse') alvoFator = 0.22;
+        });
+
+        caixa.addEventListener('pointerleave', function () {
+            alvoFator = 1;
+        });
+
+        caixa.addEventListener('pointerdown', function (evento) {
+            if (evento.button) return;
+            arrastando = true;
+            impulso = 0;
+            ultimoX = evento.clientX;
+            ultimoMovimento = window.performance.now();
+            caixa.classList.add('arrastando');
+            if (caixa.setPointerCapture) caixa.setPointerCapture(evento.pointerId);
+        });
+
+        caixa.addEventListener('pointermove', function (evento) {
+            if (!arrastando) return;
+
+            var agora = window.performance.now();
+            var dx = evento.clientX - ultimoX;
+
+            avancar(dx);
+            impulso = Math.max(-2200, Math.min(2200, dx / (Math.max(agora - ultimoMovimento, 8) / 1000)));
+            ultimoX = evento.clientX;
+            ultimoMovimento = agora;
+        });
+
+        function largarPonteiro(evento) {
+            if (!arrastando) return;
+            arrastando = false;
+            caixa.classList.remove('arrastando');
+            ultimoTempo = window.performance.now();
+            if (caixa.releasePointerCapture && caixa.hasPointerCapture && caixa.hasPointerCapture(evento.pointerId)) {
+                caixa.releasePointerCapture(evento.pointerId);
+            }
+        }
+
+        caixa.addEventListener('pointerup', largarPonteiro);
+        caixa.addEventListener('pointercancel', largarPonteiro);
+
+        var esperaResize = null;
+        window.addEventListener('resize', function () {
+            window.clearTimeout(esperaResize);
+            esperaResize = window.setTimeout(medir, 200);
+        });
+
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) segurar();
+            else soltar();
+        });
+
+        // fora da tela a faixa não gasta quadro nenhum
+        if (temObservador) {
+            new IntersectionObserver(
+                function (entradas) {
+                    entradas.forEach(function (entrada) {
+                        if (entrada.isIntersecting) soltar();
+                        else segurar();
+                    });
+                },
+                { rootMargin: '150px 0px' }
+            ).observe(caixa);
+        }
+
+        medir();
+        tocar();
+
+        // a fonte da web troca as larguras depois de carregar
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(medir);
+        }
+    }
+
+    /* ------------------------------------------------------------
+       Títulos que sobem palavra por palavra
+    ------------------------------------------------------------ */
+    function iniciarTitulos() {
+        Array.prototype.slice.call(document.querySelectorAll('[data-dividir]')).forEach(function (titulo) {
+            var palavras = titulo.textContent.trim().split(/\s+/);
+
+            titulo.textContent = '';
+
+            palavras.forEach(function (palavra, indice) {
+                var caixa = document.createElement('span');
+                var interno = document.createElement('span');
+
+                caixa.className = 'palavra';
+                caixa.style.setProperty('--i', indice);
+                interno.textContent = palavra;
+                caixa.appendChild(interno);
+
+                titulo.appendChild(caixa);
+                if (indice < palavras.length - 1) titulo.appendChild(document.createTextNode(' '));
+            });
+        });
+    }
+
+    /* ------------------------------------------------------------
+       Cargo que se digita sozinho no título
+    ------------------------------------------------------------ */
+    function iniciarPapeis() {
+        var alvo = document.querySelector('#papel');
+        if (!alvo) return;
+
+        var papeis = (alvo.dataset.papeis || '').split('|').filter(Boolean);
+        if (!papeis.length) return;
+
+        alvo.textContent = papeis[0];
+
+        if (papeis.length < 2 || prefereMenosMovimento) return;
+
+        var indice = 0;
+        var texto = papeis[0];
+        var apagando = true;
+        var espera = null;
+
+        function passo() {
+            var papel = papeis[indice % papeis.length];
+
+            if (apagando) {
+                texto = papel.slice(0, Math.max(0, texto.length - 1));
+                alvo.textContent = texto;
+
+                if (!texto) {
+                    apagando = false;
+                    indice += 1;
+                    espera = window.setTimeout(passo, 280);
+                    return;
+                }
+
+                espera = window.setTimeout(passo, 34);
+                return;
+            }
+
+            texto = papel.slice(0, texto.length + 1);
+            alvo.textContent = texto;
+
+            if (texto === papel) {
+                apagando = true;
+                espera = window.setTimeout(passo, 2000);
+                return;
+            }
+
+            espera = window.setTimeout(passo, 68);
+        }
+
+        // pausa com a aba escondida: nada de digitar para uma tela que ninguém vê
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) window.clearTimeout(espera);
+            else espera = window.setTimeout(passo, 600);
+        });
+
+        espera = window.setTimeout(passo, 2200);
+    }
+
+    /* ------------------------------------------------------------
+       Cartões: luz que segue o cursor e leve inclinação 3D
+    ------------------------------------------------------------ */
+    function iniciarCartoes() {
+        var cartoes = Array.prototype.slice.call(document.querySelectorAll('[data-cartao]'));
+
+        if (!cartoes.length || prefereMenosMovimento) return;
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+        var atual = null;
+        var ponteiroX = 0;
+        var ponteiroY = 0;
+        var pendente = false;
+
+        function atualizar() {
+            pendente = false;
+            if (!atual) return;
+
+            var caixa = atual.getBoundingClientRect();
+            var px = (ponteiroX - caixa.left) / caixa.width;
+            var py = (ponteiroY - caixa.top) / caixa.height;
+            var giro = Number(atual.dataset.cartao) || 0;
+
+            atual.style.setProperty('--mx', (px * 100).toFixed(2) + '%');
+            atual.style.setProperty('--my', (py * 100).toFixed(2) + '%');
+
+            if (giro) {
+                atual.style.setProperty('--rx', ((0.5 - py) * giro).toFixed(2) + 'deg');
+                atual.style.setProperty('--ry', ((px - 0.5) * giro).toFixed(2) + 'deg');
+            }
+        }
+
+        cartoes.forEach(function (cartao) {
+            cartao.addEventListener('pointermove', function (evento) {
+                if (evento.pointerType !== 'mouse') return;
+
+                atual = cartao;
+                ponteiroX = evento.clientX;
+                ponteiroY = evento.clientY;
+
+                if (pendente) return;
+                pendente = true;
+                window.requestAnimationFrame(atualizar);
+            });
+
+            cartao.addEventListener('pointerleave', function () {
+                if (atual === cartao) atual = null;
+                cartao.style.removeProperty('--rx');
+                cartao.style.removeProperty('--ry');
+            });
+        });
+    }
+
+    /* ------------------------------------------------------------
+       Rolagem: progresso, parallax e volta ao topo
+    ------------------------------------------------------------ */
+    function iniciarRolagem() {
+        var barra = document.querySelector('#progresso-barra');
+        var botao = document.querySelector('#ao-topo');
+        var cabecalho = document.querySelector('header');
+        var perfil = document.querySelector('#perfil');
+        var rodape = document.querySelector('footer');
+        var pendente = false;
+
+        function atualizar() {
+            pendente = false;
+
+            var y = window.scrollY || window.pageYOffset || 0;
+            var tela = window.innerHeight;
+            var rolavel = document.documentElement.scrollHeight - tela;
+
+            if (barra) {
+                var progresso = rolavel > 0 ? Math.min(1, Math.max(0, y / rolavel)) : 0;
+                barra.style.transform = 'scaleX(' + progresso.toFixed(4) + ')';
+            }
+
+            if (botao) botao.classList.toggle('visivel', y > tela * 0.7);
+
+            if (prefereMenosMovimento) return;
+
+            // o fundo do topo desce mais devagar que o conteúdo: dá profundidade
+            var avanco = Math.min(y, tela);
+            if (cabecalho) cabecalho.style.setProperty('--parallax', (avanco * 0.2).toFixed(1) + 'px');
+            if (perfil) perfil.style.setProperty('--deriva', (avanco * -0.07).toFixed(1) + 'px');
+
+            if (rodape) {
+                var caixa = rodape.getBoundingClientRect();
+                if (caixa.top < tela && caixa.bottom > 0) {
+                    var entrada = (tela - caixa.top) / (tela + caixa.height);
+                    rodape.style.setProperty('--parallax', ((entrada - 0.5) * 80).toFixed(1) + 'px');
+                }
+            }
+        }
+
+        function agendar() {
+            if (pendente) return;
+            pendente = true;
+            window.requestAnimationFrame(atualizar);
+        }
+
+        if (botao) {
+            botao.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: prefereMenosMovimento ? 'auto' : 'smooth' });
+            });
+        }
+
+        window.addEventListener('scroll', agendar, { passive: true });
+        window.addEventListener('resize', agendar);
+        atualizar();
+    }
+
     function iniciar() {
         iniciarVento();
         iniciarRastro();
         iniciarMenu();
         iniciarNavegacao();
+        iniciarTitulos();
         iniciarRevelacao();
         iniciarFiltro();
+        iniciarEsteira();
+        iniciarCartoes();
+        iniciarPapeis();
+        iniciarRolagem();
     }
 
     if (document.readyState === 'loading') {

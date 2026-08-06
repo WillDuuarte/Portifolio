@@ -32,6 +32,7 @@
     justify-self: center;
     padding: 12px;
     border: solid 2px transparent;
+    text-decoration: none;
 }
 
 .projeto img {
@@ -54,8 +55,14 @@
     margin-top: 12px;
 }
 
-.projeto:hover {
+.projeto:hover,
+.projeto:focus-visible {
     border-color: var(--gray-300);
+}
+
+.projeto:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
 }
 
 main section {

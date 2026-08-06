@@ -87,11 +87,18 @@
 }
 
 .projeto {
-    transition: transform 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), border-color 300ms ease, box-shadow 300ms ease;
 }
 
+/* enquanto o cursor está em cima, o transform precisa acompanhar de perto;
+   ao sair, volta devagar para o lugar */
 .projeto:hover {
-    transform: translateY(-6px);
+    transition: transform 90ms linear, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.projeto:hover,
+.projeto:focus-visible {
+    --lift: -6px;
     box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.9);
 }
 
@@ -99,7 +106,8 @@
     transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.projeto:hover img {
+.projeto:hover img,
+.projeto:focus-visible img {
     transform: scale(1.05);
 }
 
@@ -117,7 +125,8 @@
     transition: border-color 300ms ease, transform 300ms ease;
 }
 
-.contato:hover {
+.contato:hover,
+.contato:focus-visible {
     transform: translateY(-3px);
 }
 
@@ -195,12 +204,21 @@
         animation: none;
     }
     .projeto:hover,
+    .projeto:focus-visible,
     .projeto:hover img,
+    .projeto:focus-visible img,
     .ngc:hover,
     .contato:hover,
+    .contato:focus-visible,
     .filtro:hover,
     #tec div:hover,
     #tec div:hover img {
         transform: none;
+    }
+
+    .projeto {
+        --lift: 0px;
+        --rx: 0deg;
+        --ry: 0deg;
     }
 }
